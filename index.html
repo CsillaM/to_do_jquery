@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>To Do List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+        crossorigin="anonymous">
+    <style>
+        body {
+
+            background-image: url("http://static2.bigstockphoto.com/thumbs/6/0/1/large1500/106531517.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .container {
+            width: 80%x;
+            margin-top: 30px;
+        }
+
+        #header {
+            width: 75%;
+            MARGIN: auto;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px #D3D3D3 solid;
+            border-radius: 3px;
+        }
+
+
+        h1 {
+            text-align: center;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .green {
+            color: white;
+            background-color: green;
+        }
+
+        .strikethrough {
+            text-decoration: line-through;
+        }
+
+        .form-group {
+            margin-right: 10px;
+            margin-left: 20px;
+        }
+
+        .form-inline {
+            padding-bottom: 10px;
+        }
+
+        #formsubmit {
+            margin-left: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="header">
+
+            <h1>Doggy Do List</h1>
+
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="exampleInputName2">Task</label>
+                    <input type="text" class="form-control" id="todoname" name="todoname" placeholder="task name">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail2">Due Date</label>
+                    <input type="date" class="form-control" id="tododate" name="tododate" placeholder="7-10-2017">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail2">Priority</label>
+                    <select name="todo_priority" id="todo_priority"> 
+                    <option>1</option>
+                    <option>2</option> 
+                    <option>3</option> 
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+                    <button type="submit" class="btn btn-default" id="formsubmit">Add Task</button>
+                </div>
+            </form>
+            <ul class="list-group" id="todo-list">
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- <h2>Assignment</h2>
+
+    <ul>
+        <li>Append To Do tasks from the object.</li>
+        <li>Highlight past due items red.</li>
+        <li>Cross out items that are competed.</li>
+        <li>Put completed tasks on the bottom of the list</li>
+    </ul>
+
+    <h2>Bonus</h2>
+
+    <ul>
+        <li>Add a form to insert new to-do items.</li>
+        <li>Add new field to To-Do items priority, a number between 1 and 5.</li>
+        <li>Sort To-Do based on priority. </li>
+        <li>(Make all completed tasks 0 priority.)</li> -->
+    </ul>
+
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+        crossorigin="anonymous"></script>
+
+
+
+
+    <script>
+        var tasks = [
+            {
+                task_name: 'Clean Dishes',
+                task_is_done: false,
+                task_due: '2017-12-03',
+                task_priority: 5,
+            },
+            {
+                task_name: 'Buy a cat!',
+                task_is_done: false,
+                task_due: '2017-06-03',
+                task_priority: 1,
+            },
+            {
+                task_name: 'Propose to Katy Perry',
+                task_is_done: true,
+                task_due: '2017-05-05',
+                task_priority: 4,
+            },
+            {
+                task_name: 'Start eating two apples a day.',
+                task_is_done: false,
+                task_due: '2017-11-20',
+                task_priority: 5,
+            },
+            {
+                task_name: 'Clean kitty litter.',
+                task_is_done: false,
+                task_due: '2016-05-13',
+                task_priority: 1,
+            },
+        ]
+
+        $(document).ready(function () {
+
+            if (localStorage.getItem("todos")) {
+                tasks = JSON.parse(localStorage.getItem("todos"))
+            }
+
+            $("form").on("submit", function (evt) {
+                readForm(this);
+                return false;
+            });
+            render();
+
+            function render() {
+                tasks.sort(function (a, b) {
+                    var firstPriority = a.task_priority;
+                    var secondPriority = b.task_priority;
+                    if (!a.task_is_done) {
+                        firstPriority = firstPriority - 5;
+                    }
+                    if (!b.task_is_done) {
+                        secondPriority = secondPriority - 5;
+                    }
+                    return firstPriority - secondPriority;
+                });
+                $("#todo-list").html("");
+                for (var i = 0; i < tasks.length; i++) {
+                    // This is the ternary expression: late(tasks[i].task_due) ? 'red' : ''
+                    // Long way of writing out the ternary expression:
+                    // var isLate = late(tasks[i].task_due);
+                    // var lateClass = '';
+                    // if (isLate) {
+                    //     lateClass = 'red';
+                    // }
+                    $("#todo-list").append(`<li id="${i}" class="list-group-item">
+                    <div class="row">
+                    <div class="col">
+                    <h6 class="task_name mt-0 dedit-simple ${(!tasks[i].task_is_done) && late(tasks[i].task_due) ? 'red' : ''} ${strikethrough(tasks[i].task_is_done)}">${tasks[i].task_name}</h6> 
+                    </div> 
+                    <div class="col">            
+                    <input class="btn btn-outline-success done ${tasks[i].task_is_done ? 'green' : ''}" type="button" value="DONE">
+                    </div>
+                    <div class="col">
+                    <h6 class="mt-0">${updateDateFormat(tasks[i].task_due)}</h6> 
+                    </div>
+                    <div class="col priority">
+                    <h6 class="task_priority mt-0">Priority: ${tasks[i].task_is_done ? '0' : tasks[i].task_priority}</h6> 
+                    </div>
+                    <div class="col">            
+                    <button class="btn btn-s btn-outline-primary edit type="button">edit</button>
+                    </div>
+                    <div class="col">            
+                    <button class="btn btn-xs btn-danger remove type="button">X</button>
+                    </div>
+                    </div>
+                    </li>`)
+                }
+
+                var todos = $("#todo-list").html();
+                localStorage.setItem('todos', JSON.stringify(tasks));
+            }
+
+            //A function to test if something is late.
+            function late(date) {
+                var arr = date.split("-");
+                var jsFormat = new Date(parseInt(arr[0]), parseInt(arr[1]) - 1, parseInt(arr[2]));
+                if (jsFormat > new Date()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            //format date for array
+            function todoDateFormat(newDate) {
+                var arr = date.split("-");
+                var jsFormat = new Date(parseInt(arr[0]), parseInt(arr[1]) - 1, parseInt(arr[2]));
+                if (jsFormat > new Date()) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            function updateDateFormat(date) {
+                var arr = date.split("-");
+                var year = arr.shift();
+                arr.push(year);
+                return arr.join("-");
+            }
+
+            $("#todo-list").on("click", ".done", function () {
+                var $task = $(this).parents("li");
+                var currentId = $task.attr("id");
+                var doneNow = tasks[currentId].task_is_done;
+                tasks[currentId].task_is_done = !doneNow;
+                render();
+            });
+
+            $("#todo-list").on("click", ".remove", function () {
+                var $task = $(this).parents("li");
+                var currentId = $task.attr("id");
+                tasks.splice(currentId, 1);
+                render();
+            });
+            $("#todo-list").on("click", ".edit", function () {
+                var $task = $(this).parents("li");
+                var currentId = $task.attr("id");
+                popUpEdit(currentId);
+            });
+            $("#todo-list").on("submit", "form", function () {
+                var $task = $(this).parents("li");
+                var currentId = $task.attr("id");
+                readForm(this);
+                return false;
+                render();
+            });
+
+
+            function strikethrough(done) {
+                if (done) {
+                    return "strikethrough";
+                }
+                return "";
+            }
+            function readForm(currentForm) {
+                var $currentForm = $(currentForm);
+                var $task = $currentForm.parents("li");
+                var isEdit = false;
+                if ($task.length) {
+                    var task = tasks[$task.attr("id")]
+                    var isEdit = true;
+                }
+                var toDoName = $currentForm.find("input[name='todoname']").val();
+                var toDoDate = $currentForm.find("input[name='tododate']").val();
+                var formData = {
+                    task_name: toDoName,
+                    task_is_done: isEdit ? task.task_is_done : false,
+                    task_due: toDoDate,
+                    task_priority: parseInt($currentForm.find("select[name='todo_priority']").val()),
+                };
+                if (isEdit) {
+                    tasks[$task.attr("id")] = formData;
+                } else {
+                    tasks.push(formData);
+                    $("form").trigger("reset");
+                }
+                localStorage.setItem('todos', JSON.stringify(tasks));
+                render();
+            }
+            //here we pass the value of currentID (a list element value fromthe current form) from the edit handler:
+            function popUpEdit(currentIdVal) {
+                var task = tasks[currentIdVal]
+                $(`#${currentIdVal}`).html(`<form class="form-inline">
+                <div class="form-group">
+                    <label for="exampleInputName2">Task</label>
+                    <input type="text" class="form-control" name="todoname" value="${task.task_name}">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail2">Due Date</label>
+                    <input type="date" class="form-control" name="tododate" value="${task.task_due}">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputEmail2">Priority</label>
+                    <select name="todo_priority" name="todo_priority" value="${task.task_priority}"> 
+                    <option>1</option>
+                    <option>2</option> 
+                    <option>3</option> 
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+                    <button type="submit" class="btn btn-default formedit">Edit Task</button>
+                </div>
+            </form>`);
+            }
+
+        });
+    </script>
+</body>
+
+</html>
